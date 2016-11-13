@@ -1,6 +1,7 @@
 eventbot-web-api
 ================
 
+[![CircleCI](https://circleci.com/gh/duffj/eventbot-web-api.svg?style=svg)](https://circleci.com/gh/duffj/eventbot-web-api)
 
 Eventbot web API.
 
