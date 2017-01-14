@@ -27,4 +27,7 @@ FIELD_MAPPINGS = {
 
 class ApplicationForm(FlaskForm):
     # name = StringField('Field3', validators=[DataRequired()])
-    Field3 = StringField('Field3')
+    Field3 = StringField('Field3') # name
+    Field5 = StringField('Field5') # email
+    Field11 = StringField('Field11') # yourself
+    Field12 = StringField('Field12') # what interests

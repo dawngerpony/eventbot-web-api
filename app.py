@@ -59,7 +59,12 @@ def web_hook_application_form():
             'label.field_id': form.Field3.label.field_id,
             'name': form.Field3.name
         }
-        text = "{} submitted an application form.".format(form.Field3.data)
+        text = """
+'{}' ({}) submitted an application form.
+*Please tell us about yourself:* {}
+*What interests you?* {}
+""".format(form.Field3.data, form.Field5.data, form.Field11.data, form.Field12.data)
+
         slack_webhook_obj = {"text": text}
         requests.post(slack_webhook_url, data=json.dumps(slack_webhook_obj))
     logger.info("d: {}".format(json.dumps(d)))
