@@ -15,7 +15,7 @@ def hello():
     return "Hello World!"
 
 
-@app.route("/webhook/application_form")
+@app.route("/webhook/application_form", methods=['POST', 'GET'])
 def web_hook_application_form():
     logger.info("web_hook_application_form")
     d = {
