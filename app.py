@@ -24,8 +24,10 @@ def web_hook_application_form():
         'body': flask.request.data
     }
     # logger.info(flask.request.data)
-    # logger.info("request: {}".format(flask.request.get_json()))
-    # logger.info("d: {}".format(json.dumps(d)))
+    logger.info("request data: {}".format(flask.request.data))
+    logger.info("request form: {}".format(flask.request.form))
+    logger.info("request headers: {}".format(flask.request.headers))
+    logger.info("d: {}".format(json.dumps(d)))
     return flask.jsonify(**d)
     # return flask.jsonify(**flask.request.get_json())
     # return flask.request.get_json()
