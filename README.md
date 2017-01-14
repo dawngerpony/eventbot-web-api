@@ -5,6 +5,11 @@ eventbot-web-api
 
 Eventbot web API.
 
+To run locally
+--------------
+
+    make local
+
 
 Technologies
 ------------
