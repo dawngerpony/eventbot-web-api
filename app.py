@@ -3,12 +3,14 @@
 from flask import Flask
 from flask_restful import Resource, Api
 
+import settings
 from forms import ApplicationForm
 from flask_wtf import csrf
 from flask_wtf.csrf import CSRFProtect
 # from flask_wtf.csrf.CSRFProtect import exempt
 import flask
 import logging
+import requests
 import simplejson as json
 
 
@@ -28,7 +30,7 @@ app.config.setdefault('WTF_CSRF_CHECK_DEFAULT', False)
 app.config.setdefault('WTF_CSRF_ENABLED', False)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-csrf = CSRFProtect(app)
+# csrf = CSRFProtect(app)
 # csrf.exempt('web_hook_application_form')
 
 
@@ -39,6 +41,9 @@ def hello():
 
 @app.route("/webhook/application_form", methods=['POST', 'GET'])
 def web_hook_application_form():
+    """ Web hook for incoming application forms.
+    """
+    slack_webhook_url = settings.SLACK_WEBHOOK_URL
     logger.info("web_hook_application_form")
     form = ApplicationForm()
     logger.info("request data: {}".format(flask.request.data))
@@ -54,6 +59,9 @@ def web_hook_application_form():
             'label.field_id': form.Field3.label.field_id,
             'name': form.Field3.name
         }
+        text = "{} submitted an application form.".format(form.Field3.data)
+        slack_webhook_obj = {"text": text}
+        requests.post(slack_webhook_url, data=json.dumps(slack_webhook_obj))
     logger.info("d: {}".format(json.dumps(d)))
     return flask.jsonify(**d)
 
