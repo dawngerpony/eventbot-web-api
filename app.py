@@ -4,6 +4,7 @@ from flask import Flask
 
 import flask
 import logging
+import simplejson as json
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -19,9 +20,15 @@ def hello():
 def web_hook_application_form():
     logger.info("web_hook_application_form")
     d = {
-        'status': 'ok'
+        'status': 'ok',
+        'body': flask.request.data
     }
+    # logger.info(flask.request.data)
+    # logger.info("request: {}".format(flask.request.get_json()))
+    # logger.info("d: {}".format(json.dumps(d)))
     return flask.jsonify(**d)
+    # return flask.jsonify(**flask.request.get_json())
+    # return flask.request.get_json()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
