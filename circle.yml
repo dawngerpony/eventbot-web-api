@@ -1,3 +1,9 @@
 test:
   override:
     - make test
+
+deployment:
+  staging:
+    branch: master
+    heroku:
+      appname: floating-refuge-91822

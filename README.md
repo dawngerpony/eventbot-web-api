@@ -5,6 +5,13 @@ eventbot-web-api
 
 Eventbot web API.
 
+
+Pipeline
+--------
+
+CircleCI is configured to auto-deploy to Heroku if the build passes.
+
+
 To run locally
 --------------
 
@@ -15,8 +22,11 @@ Technologies
 ------------
 
 * Python
+    * Flask web microframework
+    * flask-wtf - for forms
+    * nosetests2
 * Heroku
-
+* CircleCI
 
 Links
 -----
