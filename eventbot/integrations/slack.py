@@ -1,7 +1,7 @@
 import requests
 import simplejson as json
 
-from app import settings
+from eventbot import settings
 
 
 def post_form_to_webhook(form):
