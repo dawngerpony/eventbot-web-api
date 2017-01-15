@@ -31,3 +31,13 @@ class ApplicationForm(FlaskForm):
     Field5 = StringField('Field5') # email
     Field11 = StringField('Field11') # yourself
     Field12 = StringField('Field12') # what interests
+
+    def values(self):
+        """ Return all values as a dict, with more user-friendly names.
+        """
+        return {
+            'name': self.Field3.data,
+            'email': self.Field5.data,
+            'bio': self.Field11.data,
+            'interests': self.Field12.data
+        }
