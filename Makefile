@@ -1,6 +1,6 @@
 #!make
 # http://unix.stackexchange.com/questions/235223/makefile-include-env-file
-include .env
+# include .env
 # export $(shell sed 's/=.*//' .env)
 
 
@@ -13,4 +13,4 @@ run:
 	mongod --dbpath ./data/db
 
 test:
-	nose2 --verbose
+	heroku local test
