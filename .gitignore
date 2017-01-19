@@ -1,3 +1,9 @@
+private.md
+
+example_*.json
+members_export_*.zip
+members_export_*.csv
+
 .env
 
 data/db/

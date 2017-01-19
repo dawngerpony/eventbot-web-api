@@ -9,7 +9,7 @@ SHELL := /bin/bash
 local:
 	heroku local web
 
-run:
+db:
 	mongod --dbpath ./data/db
 
 test:
