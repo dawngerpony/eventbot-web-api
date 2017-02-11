@@ -1,3 +1,4 @@
+# coding=utf-8
 import bot
 import simplejson as json
 import unittest
@@ -20,7 +21,8 @@ class ApiTestCase(unittest.TestCase):
 def build_payload():
     """ Build a payload for the test.
     """
-    expected_name = 'Dafydd Integration Test'
+    expected_name = u'Dafydd Integråtion Tëst'
+    # expected_name = 'Dafydd Integration Test'
     expected_email = 'dafydd@afterpandora.com'
     expected_bio = 'bio'
     expected_interests = 'interests'

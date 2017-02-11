@@ -11,7 +11,7 @@ from integrations import slack
 app = Flask(__name__)
 
 app.config.setdefault('WTF_CSRF_ENABLED', False)
-LOG_FORMAT = '[%(asctime)s] %(filename)s:%(lineno)s - %(funcName)20s() [%(levelname)s] %(message)s'
+LOG_FORMAT = '%(filename)s:%(lineno)s - %(funcName)20s() [%(levelname)s] %(message)s'
 logging.basicConfig(format=LOG_FORMAT, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -26,16 +26,17 @@ def hello():
 def web_hook_application_form():
     """ Web hook for incoming application forms.
     """
-    logger.info("Received form: {}".format(flask.request.form))
+    request_id = flask.request.headers.get('X-Request-ID', 'unknown')
+    logger.info(u"request_id={} Received form: {}".format(request_id, flask.request.form))
     form = ApplicationForm()
-    logger.debug("request headers: {}".format(flask.request.headers))
+    logger.debug("request_id={} request headers: {}".format(request_id, flask.request.headers))
     d = {
         'status': 'ok',
         'form': flask.request.form
     }
     if form.validate_on_submit():
         slack.post_form_to_webhook(form)
-    logger.debug("d: {}".format(json.dumps(d)))
+    logger.debug(u"request_id={} d: {}".format(request_id, json.dumps(d)))
     return flask.jsonify(**d)
 
 

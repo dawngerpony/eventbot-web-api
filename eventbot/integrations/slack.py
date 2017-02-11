@@ -8,7 +8,7 @@ def post_form_to_webhook(form):
     """ Post the contents of a form to Slack.
     """
     d = form.values()
-    text = """
+    text = u"""
     '{name}' ({email}) submitted an application form.
     *Please tell us about yourself:* {bio}
     *What interests you?* {interests}
