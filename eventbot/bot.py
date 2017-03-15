@@ -49,7 +49,7 @@ def web_hook_eventbrite():
     request_id = flask.request.headers.get(HTTP_HEADER_REQUEST_ID, 'unknown')
     # logger.info(u"request_id={} Received Eventbrite notification: {}".format(request_id, flask.request.form))
     request_data = flask.request.get_json()
-    logger.debug("request_id={} request headers: {}".format(request_id, flask.request.headers))
+    logger.info("request_id={} headers={} body={}".format(request_id, flask.request.headers, json.dumps(request_data)))
     d = {
         'status': 'ok',
         'data': request_data
@@ -65,7 +65,7 @@ def web_hook_mailchimp():
     request_id = flask.request.headers.get(HTTP_HEADER_REQUEST_ID, 'unknown')
     request_data = flask.request.get_json()
     # logger.info(u"request_id={} Received MailChimp notification: {}".format(request_id, flask.request.form))
-    logger.info("request_id={} headers={} body={}".format(request_id, flask.request.headers, flask.request.data))
+    logger.info("request_id={} headers={} body={}".format(request_id, flask.request.headers, json.dumps(request_data)))
     d = {
         'status': 'ok',
         'data': request_data
