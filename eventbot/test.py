@@ -1,6 +1,6 @@
 # coding=utf-8
 import bot
-import simplejson as json
+import simplejson
 import unittest
 
 
@@ -14,14 +14,30 @@ class ApiTestCase(unittest.TestCase):
 
     def test_webhook_application_form(self):
         rv = self.app.post('/webhook/application_form', data=build_form_payload())
-        o = json.loads(rv.data)
+        # print 'rv.data', rv.data
+        o = simplejson.loads(rv.data)
         assert o['status'] == 'ok', o['status']
 
+    # @unittest.skip("testing skipping")
     def test_webhook_eventbrite(self):
-        data = {}
-        rv = self.app.post('/webhook/eventbrite', data=data)
-        o = json.loads(rv.data)
+        data = {
+            'test': True
+        }
+        rv = self.app.post('/webhook/eventbrite', data=simplejson.dumps(data), content_type='application/json')
+        o = simplejson.loads(rv.data)
         assert o['status'] == 'ok', o['status']
+        assert o['data']['test'] is True, o
+
+    # @unittest.skip("testing skipping")
+    def test_webhook_mailchimp(self):
+        data = {
+            'test': True
+        }
+        resp = self.app.post('/webhook/mailchimp', data=simplejson.dumps(data), content_type='application/json')
+        resp_data = resp.data
+        o = simplejson.loads(resp_data)
+        assert o['status'] == 'ok', o['status']
+        assert o['data']['test'] is True, o
 
 
 def build_form_payload():

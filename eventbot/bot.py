@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 HTTP_HEADER_REQUEST_ID = 'X-Request-ID'
 
+
 @app.route("/")
 def hello():
     d = {'status': 'ok'}
@@ -47,9 +48,27 @@ def web_hook_eventbrite():
     """
     request_id = flask.request.headers.get(HTTP_HEADER_REQUEST_ID, 'unknown')
     # logger.info(u"request_id={} Received Eventbrite notification: {}".format(request_id, flask.request.form))
+    request_data = flask.request.get_json()
     logger.debug("request_id={} request headers: {}".format(request_id, flask.request.headers))
     d = {
-        'status': 'ok'
+        'status': 'ok',
+        'data': request_data
+    }
+    logger.debug(u"request_id={} d: {}".format(request_id, json.dumps(d)))
+    return flask.jsonify(**d)
+
+
+@app.route("/webhook/mailchimp", methods=['POST', 'GET'])
+def web_hook_mailchimp():
+    """ Web hook for incoming MailChimp changes.
+    """
+    request_id = flask.request.headers.get(HTTP_HEADER_REQUEST_ID, 'unknown')
+    request_data = flask.request.get_json()
+    # logger.info(u"request_id={} Received MailChimp notification: {}".format(request_id, flask.request.form))
+    logger.info("request_id={} headers={} body={}".format(request_id, flask.request.headers, flask.request.data))
+    d = {
+        'status': 'ok',
+        'data': request_data
     }
     logger.debug(u"request_id={} d: {}".format(request_id, json.dumps(d)))
     return flask.jsonify(**d)
