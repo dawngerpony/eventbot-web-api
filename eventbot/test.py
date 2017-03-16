@@ -1,5 +1,6 @@
 # coding=utf-8
 import bot
+import fixtures
 import simplejson
 import unittest
 
@@ -13,31 +14,32 @@ class ApiTestCase(unittest.TestCase):
         pass
 
     def test_webhook_application_form(self):
-        rv = self.app.post('/webhook/application_form', data=build_form_payload())
-        # print 'rv.data', rv.data
-        o = simplejson.loads(rv.data)
-        assert o['status'] == 'ok', o['status']
+        self.post_json_to_webhook(path='/webhook/mailchimp', data=build_form_payload())
 
     # @unittest.skip("testing skipping")
     def test_webhook_eventbrite(self):
-        data = {
-            'test': True
-        }
-        rv = self.app.post('/webhook/eventbrite', data=simplejson.dumps(data), content_type='application/json')
-        o = simplejson.loads(rv.data)
-        assert o['status'] == 'ok', o['status']
+        data = {'test': True}
+        o = self.post_json_to_webhook(path='/webhook/mailchimp', data=data)
         assert o['data']['test'] is True, o
+
+    # @unittest.skip("testing skipping")
+    def test_webhook_eventbrite_order_placed(self):
+        o = self.post_json_to_webhook(path='/webhook/mailchimp', data=simplejson.loads(fixtures.EVENTBRITE_ORDER_PLACED))
+        assert o['data']['config']['action'] == 'order.placed', o
 
     # @unittest.skip("testing skipping")
     def test_webhook_mailchimp(self):
         data = {
             'test': True
         }
-        resp = self.app.post('/webhook/mailchimp', data=simplejson.dumps(data), content_type='application/json')
-        resp_data = resp.data
-        o = simplejson.loads(resp_data)
-        assert o['status'] == 'ok', o['status']
+        o = self.post_json_to_webhook(path='/webhook/mailchimp', data=data)
         assert o['data']['test'] is True, o
+
+    def post_json_to_webhook(self, path, data):
+        resp = self.app.post(path, data=simplejson.dumps(data), content_type='application/json')
+        o = simplejson.loads(resp.data)
+        assert o['status'] == 'ok', o['status']
+        return o
 
 
 def build_form_payload():
