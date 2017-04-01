@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from requests.auth import HTTPBasicAuth
 import logging
 import requests
+import requests_cache
 import settings
 
 # http://developer.mailchimp.com/documentation/mailchimp/guides/get-started-with-mailchimp-api-3/
@@ -9,6 +9,8 @@ REGION = "us2"
 BASE_URL = 'https://{}.api.mailchimp.com/3.0'.format(REGION)
 
 log = logging.getLogger(__name__)
+
+requests_cache.install_cache('mailchimp')
 
 
 def check_interest(email, list_name, interest_category_name, interest_name):
@@ -19,11 +21,16 @@ def check_interest(email, list_name, interest_category_name, interest_name):
     if len(members) > 1:
         raise TooManyFoundException("Number of exact matches should never be greater than 1!")
     if len(members) < 1:
+        alt_search_result = mc.search(email, alldata=True)
         raise NotFoundException("email {} not found in the database".format(email))
     interest_id = mc.lookup_interest_id(list_name, interest_category_name, interest_name)
     return members[0]['interests'].get(interest_id, False)
 
     # return search_result['exact_matches']['members']
+
+
+def search(email, alldata=False):
+    return mc.search(email, alldata)
 
 
 class TooManyFoundException(Exception):
@@ -38,19 +45,16 @@ class MailChimpClient:
 
     apikey = ''
 
-    reference_data = {
-        'lists': {
-
-        }
-    }
-
     def __init__(self, apikey):
         self.apikey = apikey
 
-    def search(self, email):
+    def search(self, email, alldata=False):
         """ Search for a member by email.
         """
-        path = '/search-members?query={}'.format(email)
+        if alldata:
+            path = '/search-members?query=alldata:{}'.format(email)
+        else:
+            path = '/search-members?query={}'.format(email)
         o = self._get(path=path)
         return o
 
@@ -110,7 +114,6 @@ if __name__ == '__main__':
     import sys
     test_apikey = sys.argv[1]
     argv = sys.argv
-    mc = MailChimpClient(apikey=test_apikey)
     pp = pprint.PrettyPrinter(indent=4)
-    result = mc.check_interest(email=argv[2], list_name=argv[3], interest_category_name=argv[4], interest_name=argv[5])
+    # result = mc.check_interest(email=argv[2], list_name=argv[3], interest_category_name=argv[4], interest_name=argv[5])
     pp.pprint(result)

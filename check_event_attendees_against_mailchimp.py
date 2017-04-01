@@ -39,7 +39,6 @@ def check_attendee(a):
         is_member,
         is_socialite
     ))
-    click.echo("Member={} Socialite={} (email={})".format(is_member, is_socialite, profile['email']))
 
 
 @click.command()
@@ -55,7 +54,6 @@ def check(input_filename):
 @click.option('--output_filename', default='attendees.json', help='output filename to write the JSON attendee data')
 @click.argument('eid')
 def download(eid, output_filename):
-    click.echo('Hello World!')
     attendees = eb.get_event_attendees(event_id=eid)
     with open(output_filename, 'w') as f:
         json.dump(attendees, f, indent=2)
