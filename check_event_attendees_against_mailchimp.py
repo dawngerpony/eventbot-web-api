@@ -32,13 +32,22 @@ def check_attendee(a):
         )
     except NotFoundException as e:
         log.warn(e.message)
-    click.echo("Checked {} {} (email={}): Member={} Socialite={}".format(
+    if is_member and is_socialite:
+        log.warn("Attendee {} is marked as a member and a socialite!".format(profile['email']))
+    log.info("Checked {} {} (email={}): Member={} Socialite={}".format(
         profile['first_name'],
         profile['last_name'],
         profile['email'],
         is_member,
         is_socialite
     ))
+
+
+@click.group()
+@click.option('--debug/--no-debug', default=False)
+def cli(debug):
+    click.echo('Debug mode is %s' % ('on' if debug else 'off'))
+    pass
 
 
 @click.command()
@@ -57,8 +66,11 @@ def download(eid, output_filename):
     attendees = eb.get_event_attendees(event_id=eid)
     with open(output_filename, 'w') as f:
         json.dump(attendees, f, indent=2)
-    click.echo('Attendee data ({} records) written to {}'.format(len(attendees), output_filename))
+    log.info('Attendee data ({} records) written to {}'.format(len(attendees), output_filename))
+
+cli.add_command(download)
+cli.add_command(check)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    check()
+    cli()
