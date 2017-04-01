@@ -3,6 +3,15 @@ Links
 
 * http://www.wufoo.com/guides/setup-webhooks-in-wufoo-to-get-push-notifications-to-your-apps/
 
+Searching for members in MailChimp
+----------------------------------
+
+From http://developer.mailchimp.com/documentation/mailchimp/reference/search-members/:
+
+    curl --request GET \
+        --url 'https://usX.api.mailchimp.com/3.0/search-members?query=freddie@' \
+        --user 'anystring:apikey' \
+        --include
 
 Posting to Slack webhook
 ------------------------
