@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from collections import Counter
 from eventbot.integrations.mailchimp_client import NotFoundException
 import click
 import eventbot.integrations.eventbrite_client as eb
@@ -57,6 +58,12 @@ def check(input_filename):
         attendees = json.load(f)
     for a in attendees:
         check_attendee(a)
+    duplicates = check_duplicates([a['profile']['email'] for a in attendees])
+    log.info("duplicates ({}): {}".format(len(duplicates), duplicates))
+
+
+def check_duplicates(emails):
+    return [k for k, v in Counter(emails).items() if v > 1]
 
 
 @click.command()
