@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
 from flask import Flask
-
 from forms import ApplicationForm
+from integrations import slack, eventbrite_client
 import flask
 import logging
+import pprint
+import settings
 import simplejson as json
-from integrations import slack
 
 app = Flask(__name__)
 
 app.config.setdefault('WTF_CSRF_ENABLED', False)
-LOG_FORMAT = '%(filename)s:%(lineno)s - %(funcName)20s() [%(levelname)s] %(message)s'
-logging.basicConfig(format=LOG_FORMAT, level=logging.INFO)
+pp = pprint.PrettyPrinter(indent=4)
+logging.basicConfig(format=settings.LOG_FORMAT, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 HTTP_HEADER_REQUEST_ID = 'X-Request-ID'
@@ -50,10 +51,14 @@ def web_hook_eventbrite():
     # logger.info(u"request_id={} Received Eventbrite notification: {}".format(request_id, flask.request.form))
     request_data = flask.request.get_json()
     logger.info("request_id={} headers={} body={}".format(request_id, flask.request.headers, json.dumps(request_data)))
+    logger.info('request_data:{}'.format(json.dumps(request_data)))
+    if request_data['config']['action'] == 'order.placed':
+        logger.info("Order placed!")
     d = {
         'status': 'ok',
         'data': request_data
     }
+    # pp.pprint(request_data)
     logger.debug(u"request_id={} d: {}".format(request_id, json.dumps(d)))
     return flask.jsonify(**d)
 

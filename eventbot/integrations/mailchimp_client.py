@@ -1,36 +1,14 @@
 #!/usr/bin/env python
+import defaults
 import logging
 import requests
 import requests_cache
-import settings
 
 # http://developer.mailchimp.com/documentation/mailchimp/guides/get-started-with-mailchimp-api-3/
 REGION = "us2"
 BASE_URL = 'https://{}.api.mailchimp.com/3.0'.format(REGION)
 
 log = logging.getLogger(__name__)
-
-requests_cache.install_cache('mailchimp')
-
-
-def check_interest(email, list_name, interest_category_name, interest_name):
-    """ Check whether the specified email address is in the list and has the interest.
-    """
-    search_result = mc.search(email)
-    members = search_result['exact_matches']['members']
-    if len(members) > 1:
-        raise TooManyFoundException("Number of exact matches should never be greater than 1!")
-    if len(members) < 1:
-        alt_search_result = mc.search(email, alldata=True)
-        raise NotFoundException("email {} not found in the database".format(email))
-    interest_id = mc.lookup_interest_id(list_name, interest_category_name, interest_name)
-    return members[0]['interests'].get(interest_id, False)
-
-    # return search_result['exact_matches']['members']
-
-
-def search(email, alldata=False):
-    return mc.search(email, alldata)
 
 
 class TooManyFoundException(Exception):
@@ -43,10 +21,24 @@ class NotFoundException(Exception):
 
 class MailChimpClient:
 
-    apikey = ''
+    api_key = ''
 
-    def __init__(self, apikey):
-        self.apikey = apikey
+    def __init__(self, api_key, cache_timeout=defaults.REQUESTS_CACHE_TIMEOUT):
+        self.api_key = api_key
+        requests_cache.install_cache('mailchimp', expire_after=cache_timeout)
+
+    def check_interest(self, email, list_name, interest_category_name, interest_name):
+        """ Check whether the specified email address is in the list and has the interest.
+        """
+        search_result = self.search(email)
+        members = search_result['exact_matches']['members']
+        if len(members) > 1:
+            raise TooManyFoundException("Number of exact matches should never be greater than 1!")
+        if len(members) < 1:
+            # alt_search_result = self.search(email, alldata=True)
+            raise NotFoundException("email {} not found in the database".format(email))
+        interest_id = self.lookup_interest_id(list_name, interest_category_name, interest_name)
+        return members[0]['interests'].get(interest_id, False)
 
     def search(self, email, alldata=False):
         """ Search for a member by email.
@@ -101,11 +93,8 @@ class MailChimpClient:
     def _get(self, path):
         url = '{}{}'.format(BASE_URL, path)
         log.debug(url)
-        resp = requests.get(url, headers={'Authorization': 'Basic {}'.format(self.apikey)})
+        resp = requests.get(url, headers={'Authorization': 'Basic {}'.format(self.api_key)})
         return resp.json()
-
-
-mc = MailChimpClient(settings.MAILCHIMP_APIKEY)
 
 
 if __name__ == '__main__':
@@ -113,7 +102,7 @@ if __name__ == '__main__':
     import pprint
     import sys
     test_apikey = sys.argv[1]
-    argv = sys.argv
+    arg = sys.argv
     pp = pprint.PrettyPrinter(indent=4)
-    # result = mc.check_interest(email=argv[2], list_name=argv[3], interest_category_name=argv[4], interest_name=argv[5])
-    pp.pprint(result)
+    # result = mc.check_interest(**sys.argv[2])
+    # pp.pprint(result)

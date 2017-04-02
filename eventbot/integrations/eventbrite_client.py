@@ -1,48 +1,55 @@
 import eventbrite
-from datetime import datetime
-
-import dateutil.parser
+import defaults
 import logging
 import requests
-import settings
+import requests_cache
 import simplejson
 
-
-eventbrite_sdk_client = eventbrite.Eventbrite(settings.EVENTBRITE_OAUTH_TOKEN)
-
-
-def get_event_attendees(event_id):
-    first_page_data = eventbrite_sdk_client.get_event_attendees(event_id=event_id)
-    if 'error' in first_page_data:
-        raise Exception(simplejson.dumps(first_page_data))
-    assert 'page_count' in first_page_data.get('pagination', {}), simplejson.dumps(first_page_data)
-    page_count = first_page_data['pagination']['page_count']
-    object_count = first_page_data['pagination']['object_count']
-    logging.debug(first_page_data['pagination'])
-    if page_count > 1:
-        batch_urls = []
-        for i in range(page_count):
-            batch_urls.append({
-                "method": "GET",
-                "relative_url": "/events/{0}/attendees/?page={1}".format(event_id, i+1)
-            })
-        data = get_batch(batch_urls)
-        attendees = []
-        i = 1
-        for page in data:
-            logging.debug("Processing page {0}".format(i))
-            attendees += page['attendees']
-            i += 1
-    else:
-        attendees = first_page_data['attendees']
-    assert len(attendees) == object_count, "len(attendees)={0}, object_count={1}".format(len(attendees), object_count)
-    debug("Number of attendees", len(attendees))
-    return attendees
+log = logging.getLogger(__name__)
 
 
-def get_batch(batch_urls):
+class EventbriteClient:
+
+    eventbrite_sdk_client = None
+
+    def __init__(self, eventbrite_oauth_token, cache_timeout=defaults.REQUESTS_CACHE_TIMEOUT):
+        self.eventbrite_sdk_client = eventbrite.Eventbrite(eventbrite_oauth_token)
+        requests_cache.install_cache('eventbot', expire_after=cache_timeout)
+
+    def get_event_attendees(self, event_id):
+        first_page_data = self.eventbrite_sdk_client.get_event_attendees(event_id=event_id)
+        if 'error' in first_page_data:
+            raise Exception(simplejson.dumps(first_page_data))
+        assert 'page_count' in first_page_data.get('pagination', {}), simplejson.dumps(first_page_data)
+        page_count = first_page_data['pagination']['page_count']
+        object_count = first_page_data['pagination']['object_count']
+        log.debug(first_page_data['pagination'])
+        if page_count > 1:
+            batch_urls = []
+            for i in range(page_count):
+                batch_urls.append({
+                    "method": "GET",
+                    "relative_url": "/events/{0}/attendees/?page={1}".format(event_id, i+1)
+                })
+            data = get_batch(batch_urls, self.eventbrite_sdk_client)
+            attendees = []
+            i = 1
+            for page in data:
+                log.debug("Processing page {0}".format(i))
+                attendees += page['attendees']
+                i += 1
+        else:
+            attendees = first_page_data['attendees']
+        log.debug("first_page_data['pagination']: {}".format(simplejson.dumps(first_page_data['pagination'])))
+        assert len(attendees) == object_count,\
+            "len(attendees)={0}, object_count={1}".format(len(attendees), object_count)
+        debug("Number of attendees", len(attendees))
+        return attendees
+
+
+def get_batch(batch_urls, eventbrite_sdk_client):
     endpoint_url = "{0}batch/".format(eventbrite.utils.EVENTBRITE_API_URL)
-    logging.debug("Batch URLs: {0}".format(simplejson.dumps(batch_urls)))
+    log.debug("Batch URLs: {0}".format(simplejson.dumps(batch_urls)))
     post_data = {"batch": simplejson.dumps(batch_urls)}
     response = requests.post(
         endpoint_url,
@@ -67,7 +74,7 @@ def get_batch(batch_urls):
 
 
 def debug(text, data):
-    logging.debug("{0}: {1}".format(text, simplejson.dumps(data)))
+    log.debug("{0}: {1}".format(text, simplejson.dumps(data)))
 
 
 def assert_len(x, y, text):
