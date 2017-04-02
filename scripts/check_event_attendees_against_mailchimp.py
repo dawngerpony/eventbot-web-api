@@ -25,6 +25,7 @@ def check_attendees(attendees):
         'members': len([a for a in results['attendees'] if a['is_member'] is True]),
         'duplicates': len(results['duplicates']),
         'not_found': len([a for a in results['attendees'] if a['found'] is False]),
+        'incorrect_ticket': len([a for a in results['attendees'] if a['has_correct_ticket'] is False]),
     }
     return results
 
@@ -36,7 +37,8 @@ def check_attendee(a):
         'email': a['profile']['email'],
         'found': False,
         'is_socialite': False,
-        'is_member': False
+        'is_member': False,
+        'has_correct_ticket': True
     }
     mc = mailchimp_client.MailChimpClient(settings.MAILCHIMP_APIKEY)
     try:
@@ -88,13 +90,20 @@ def check(eid):
     attendees = eb.get_event_attendees(event_id=eid)
     click.echo("Checking attendees against MailChimp...")
     report = check_attendees(attendees)
-    click.echo("Report: {} attendees: {} socialites, {} members, {} duplicate(s), {} not found in database".format(
-        report['totals']['attendees'],
-        report['totals']['socialites'],
-        report['totals']['members'],
-        report['totals']['duplicates'],
-        report['totals']['not_found'],
-    ))
+    click.echo("Report: {} attendees:"
+               "\n\t{} socialites"
+               "\n\t{} members"
+               "\n\t{} duplicate(s)"
+               "\n\t{} not found in database"
+               "\n\t{} with the wrong ticket".format(
+                    report['totals']['attendees'],
+                    report['totals']['socialites'],
+                    report['totals']['members'],
+                    report['totals']['duplicates'],
+                    report['totals']['not_found'],
+                    report['totals']['incorrect_ticket'],
+                )
+    )
     click.echo("Duplicates:\n\t{}".format('\n\t'.join(report['duplicates'])))
     click.echo("Not found:\n\t{}".format('\n\t'.join([a['email'] for a in report['attendees'] if a['found'] is False])))
 
