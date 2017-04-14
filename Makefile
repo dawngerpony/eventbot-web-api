@@ -7,7 +7,7 @@
 SHELL := /bin/bash
 
 local:
-	heroku local web
+	heroku local dev
 
 db:
 	mongod --dbpath ./data/db

@@ -1,3 +1,4 @@
+dev: gunicorn eventbot.bot:app --log-file=- --reload
 web: gunicorn eventbot.bot:app --log-file=-
 
 test: nose2 --verbose
