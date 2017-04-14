@@ -12,10 +12,11 @@ pp = pprint.PrettyPrinter(indent=4)
 
 @click.command()
 @click.option('--base_url', default='http://localhost:5000', help='Base URL for HTTP requests')
-@click.option('--order_id', default='123456789', help='Eventbrite order ID')
-def run(base_url, order_id):
-    data = json.loads(fixtures.EVENTBRITE_ORDER_PLACED)
-    data['api_url'] = 'https://www.eventbriteapi.com/v3/orders/{}'.format(order_id)
+@click.option('--event_id', default='123456789', help='Eventbrite event ID')
+@click.option('--attendee_id', default='123456789', help='Eventbrite attendee ID')
+def run(base_url, event_id, attendee_id):
+    data = json.loads(fixtures.EVENTBRITE_ATTENDEE_UPDATED)
+    data['api_url'] = 'https://www.eventbriteapi.com/v3/events/{}/attendees/{}/'.format(event_id, attendee_id)
     # pp.pprint(data)
     url = "{}/webhook/eventbrite".format(base_url)
     resp = requests.post(url, json=data)

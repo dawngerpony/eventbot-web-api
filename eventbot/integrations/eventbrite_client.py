@@ -31,7 +31,7 @@ class EventbriteClient:
                     "method": "GET",
                     "relative_url": "/events/{0}/attendees/?page={1}".format(event_id, i+1)
                 })
-            data = get_batch(batch_urls, self.eventbrite_sdk_client)
+            data = self.get_batch(batch_urls)
             attendees = []
             i = 1
             for page in data:
@@ -46,31 +46,36 @@ class EventbriteClient:
         debug("Number of attendees", len(attendees))
         return attendees
 
+    def get_url(self, url):
+        resp = requests.get(url, headers=self.eventbrite_sdk_client.headers)
+        data = resp.json()
+        log.debug("data: {}".format(data))
+        return data
 
-def get_batch(batch_urls, eventbrite_sdk_client):
-    endpoint_url = "{0}batch/".format(eventbrite.utils.EVENTBRITE_API_URL)
-    log.debug("Batch URLs: {0}".format(simplejson.dumps(batch_urls)))
-    post_data = {"batch": simplejson.dumps(batch_urls)}
-    response = requests.post(
-        endpoint_url,
-        data=simplejson.dumps(post_data),
-        headers=eventbrite_sdk_client.headers
-    )
-    if response.status_code != 200:
-        raise Exception(response.content)
-    if 'error' in response:
-        raise Exception(simplejson.dumps(response.content))
-    response_data = response.json()
-    debug("Number of responses received", len(response_data))
-    # debug("response_data", response_data)
-    assert_len(response_data, batch_urls, "response_data/batch_urls")
-    # responses = [simplejson.loads(item['body']) for item in response_data]
-    responses = []
-    for item in response_data:
-        responses.append(simplejson.loads(item['body']))
-    debug("Number of responses processed", len(responses))
-    assert_len(responses, response_data, "responses/response_data")
-    return responses
+    def get_batch(self, batch_urls):
+        endpoint_url = "{0}batch/".format(eventbrite.utils.EVENTBRITE_API_URL)
+        log.debug("Batch URLs: {0}".format(simplejson.dumps(batch_urls)))
+        post_data = {"batch": simplejson.dumps(batch_urls)}
+        response = requests.post(
+            endpoint_url,
+            data=simplejson.dumps(post_data),
+            headers=self.eventbrite_sdk_client.headers
+        )
+        if response.status_code != 200:
+            raise Exception(response.content)
+        if 'error' in response:
+            raise Exception(simplejson.dumps(response.content))
+        response_data = response.json()
+        debug("Number of responses received", len(response_data))
+        # debug("response_data", response_data)
+        assert_len(response_data, batch_urls, "response_data/batch_urls")
+        # responses = [simplejson.loads(item['body']) for item in response_data]
+        responses = []
+        for item in response_data:
+            responses.append(simplejson.loads(item['body']))
+        debug("Number of responses processed", len(responses))
+        assert_len(responses, response_data, "responses/response_data")
+        return responses
 
 
 def debug(text, data):

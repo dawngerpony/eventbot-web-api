@@ -101,9 +101,9 @@ def check(eid):
                     report['totals']['members'],
                     report['totals']['duplicates'],
                     report['totals']['not_found'],
-                    report['totals']['incorrect_ticket'],
-                )
-    )
+                    report['totals']['incorrect_ticket']
+                    )
+               )
     click.echo("Duplicates:\n\t{}".format('\n\t'.join(report['duplicates'])))
     click.echo("Not found:\n\t{}".format('\n\t'.join([a['email'] for a in report['attendees'] if a['found'] is False])))
 

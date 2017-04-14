@@ -7,6 +7,8 @@ import unittest
 
 class ApiTestCase(unittest.TestCase):
 
+    app = None
+
     def setUp(self):
         self.app = bot.app.test_client()
 
@@ -14,7 +16,7 @@ class ApiTestCase(unittest.TestCase):
         pass
 
     def test_webhook_application_form(self):
-        self.post_json_to_webhook(path='/webhook/mailchimp', data=build_form_payload())
+        self.post_json_to_webhook(path='/webhook/application_form', data=build_form_payload())
 
     # @unittest.skip("testing skipping")
     def test_webhook_eventbrite(self):

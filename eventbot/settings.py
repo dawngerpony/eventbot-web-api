@@ -28,3 +28,6 @@ SLACK_BOT_NAME = os.environ.get('SLACK_BOT_NAME')
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 SLACK_CHANNELS = os.environ.get('SLACK_CHANNELS', 'general,eventbot-test').split(',')
 SLACK_WEBHOOK_URL = os.getenv('SLACK_WEBHOOK_URL')
+
+SLACK_CLIENT_ID = os.environ.get('SLACK_CLIENT_ID')
+SLACK_CLIENT_SECRET = os.environ.get('SLACK_CLIENT_SECRET')
