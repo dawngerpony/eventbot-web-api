@@ -44,16 +44,29 @@ FYI I use [homebrew][1] for most of these things on my Mac.
 The app is deployed automatically to Heroku by CircleCI on
 successful build of the `master` branch.
 
+
+ngrok
+-----
+
+To run:
+
+    ngrok http 50000
+
+View the dashboard: [Dashboard](http://localhost:4040/inspect/http)
+
 Technologies
 ------------
 
 * Python - see [requirements.txt](requirements.txt)
 * Heroku
 * CircleCI
+* ngrok
 
 Links
 -----
 
 * https://elements.heroku.com/addons/mongolab
 * https://community.nitrous.io/tutorials/deploying-a-flask-application-to-heroku
-* [1]: https://brew.sh/ "homebrew"
+* [Using ngrok to develop locally for Slack](https://api.slack.com/tutorials/tunneling-with-ngrok)
+
+[1]: https://brew.sh/ "homebrew"
