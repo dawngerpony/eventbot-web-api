@@ -16,7 +16,7 @@ def post_form_to_webhook(form):
 
     # slack_webhook_obj = {"text": text}
     slack_webhook_obj = {
-        "text": "text",
+        "text": text,
         "attachments": [
             {
                 "text": "What action should I take?",
