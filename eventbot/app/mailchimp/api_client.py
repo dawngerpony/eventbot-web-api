@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-import defaults
 import logging
+
 import requests
 import requests_cache
+
+import eventbot.integrations.defaults
 
 # http://developer.mailchimp.com/documentation/mailchimp/guides/get-started-with-mailchimp-api-3/
 REGION = "us2"
@@ -23,7 +25,7 @@ class MailChimpClient:
 
     api_key = ''
 
-    def __init__(self, api_key, cache_timeout=defaults.REQUESTS_CACHE_TIMEOUT):
+    def __init__(self, api_key, cache_timeout=eventbot.integrations.defaults.REQUESTS_CACHE_TIMEOUT):
         self.api_key = api_key
         requests_cache.install_cache('mailchimp', expire_after=cache_timeout)
 

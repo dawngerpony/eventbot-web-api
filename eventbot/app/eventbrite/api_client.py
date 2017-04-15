@@ -1,9 +1,11 @@
-import eventbrite
-import defaults
 import logging
+
+import eventbrite
 import requests
 import requests_cache
 import simplejson
+
+import eventbot.integrations.defaults
 
 log = logging.getLogger(__name__)
 
@@ -12,7 +14,7 @@ class EventbriteClient:
 
     eventbrite_sdk_client = None
 
-    def __init__(self, eventbrite_oauth_token, cache_timeout=defaults.REQUESTS_CACHE_TIMEOUT):
+    def __init__(self, eventbrite_oauth_token, cache_timeout=eventbot.integrations.defaults.REQUESTS_CACHE_TIMEOUT):
         self.eventbrite_sdk_client = eventbrite.Eventbrite(eventbrite_oauth_token)
         requests_cache.install_cache('eventbot', expire_after=cache_timeout)
 

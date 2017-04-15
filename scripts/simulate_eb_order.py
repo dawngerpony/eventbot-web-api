@@ -1,10 +1,12 @@
 #!/usr/bin/env python
-from eventbot import fixtures, settings
-import click
 import logging
 import pprint
+
+import click
 import requests
 import simplejson as json
+
+from eventbot import settings, fixtures
 
 log = logging.getLogger(__name__)
 pp = pprint.PrettyPrinter(indent=4)

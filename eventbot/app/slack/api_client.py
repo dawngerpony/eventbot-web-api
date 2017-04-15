@@ -14,7 +14,6 @@ def post_form_to_webhook(form):
     *What interests you?* {interests}
     """.format(**d)
 
-    # slack_webhook_obj = {"text": text}
     slack_webhook_obj = {
         "text": text,
         "attachments": [
@@ -44,7 +43,7 @@ def post_warning_to_webhook(message):
     """
     text = u"""
     Warning! {message}
-    """.format(**d)
+    """.format(**message)
     slack_webhook_obj = {"text": text}
     slack_webhook_url = settings.SLACK_WEBHOOK_URL
     requests.post(slack_webhook_url, data=json.dumps(slack_webhook_obj))

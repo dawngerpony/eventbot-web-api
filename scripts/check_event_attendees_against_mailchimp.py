@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-from collections import Counter
-from eventbot import settings
-from eventbot.integrations.mailchimp_client import NotFoundException
-from eventbot.integrations import eventbrite_client, mailchimp_client
-import click
 import logging
+from collections import Counter
+
+import click
 import simplejson as json
+
+from eventbot import settings
+from eventbot.integrations import NotFoundException, mailchimp_client, eventbrite_client
 
 log = logging.getLogger(__name__)
 

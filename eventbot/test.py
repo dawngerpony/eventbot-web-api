@@ -1,7 +1,8 @@
 # coding=utf-8
-import bot
-import fixtures
-import simplejson
+from app import app
+from simplejson import JSONDecodeError
+import simplejson as json
+import test_fixtures as fixtures
 import unittest
 
 
@@ -10,7 +11,7 @@ class ApiTestCase(unittest.TestCase):
     app = None
 
     def setUp(self):
-        self.app = bot.app.test_client()
+        self.app = app.test_client()
 
     def tearDown(self):
         pass
@@ -26,7 +27,10 @@ class ApiTestCase(unittest.TestCase):
 
     # @unittest.skip("testing skipping")
     def test_webhook_eventbrite_order_placed(self):
-        o = self.post_json_to_webhook(path='/webhook/mailchimp', data=simplejson.loads(fixtures.EVENTBRITE_ORDER_PLACED))
+        o = self.post_json_to_webhook(
+            path='/webhook/mailchimp',
+            data=json.loads(fixtures.EVENTBRITE_ORDER_PLACED)
+        )
         assert o['data']['config']['action'] == 'order.placed', o
 
     # @unittest.skip("testing skipping")
@@ -38,8 +42,11 @@ class ApiTestCase(unittest.TestCase):
         assert o['data']['test'] is True, o
 
     def post_json_to_webhook(self, path, data):
-        resp = self.app.post(path, data=simplejson.dumps(data), content_type='application/json')
-        o = simplejson.loads(resp.data)
+        resp = self.app.post(path, data=json.dumps(data), content_type='application/json')
+        try:
+            o = json.loads(resp.data)
+        except JSONDecodeError as e:
+            print resp.data
         assert o['status'] == 'ok', o['status']
         return o
 
