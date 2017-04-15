@@ -7,7 +7,7 @@ from . import app
 import eventbot.settings
 from attendee_reporter import check_membership
 from errors import InvalidUsage
-from eventbot.integrations import slack
+from slack import api_client as slack
 from forms import ApplicationForm
 
 HTTP_HEADER_REQUEST_ID = 'X-Request-ID'

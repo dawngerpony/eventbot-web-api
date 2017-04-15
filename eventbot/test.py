@@ -47,6 +47,7 @@ class ApiTestCase(unittest.TestCase):
             o = json.loads(resp.data)
         except JSONDecodeError as e:
             print resp.data
+            self.fail("Problem decoding JSON")
         assert o['status'] == 'ok', o['status']
         return o
 
