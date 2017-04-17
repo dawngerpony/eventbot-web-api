@@ -50,3 +50,20 @@ class ApplicationForm:
             'interests': self.interests,
             'imageUrl': self.imageUrl,
         }
+
+
+class ActionForm:
+
+    def __init__(self, data):
+        pass
+
+    def values(self):
+        """ Return all values as a dict, with more user-friendly names.
+        """
+        return {
+            'name': self.name,
+            'email': self.email,
+            'bio': self.bio,
+            'interests': self.interests,
+            'imageUrl': self.imageUrl,
+        }

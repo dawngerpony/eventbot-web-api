@@ -30,7 +30,7 @@ def post_form_to_webhook(form):
             {
                 "text": "What action should I take?",
                 "fallback": "No action chosen",
-                "callback_id": "application_form_action",
+                "callback_id": d['email'],
                 "color": "#3AA3E3",
                 "attachment_type": "default",
                 "actions": [

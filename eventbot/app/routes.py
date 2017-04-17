@@ -5,9 +5,11 @@ import simplejson as json
 from flask import jsonify, request
 from . import app
 import eventbot.settings
+import urllib
 from attendee_reporter import check_membership
 from errors import InvalidUsage
 from slack import api_client as slack
+from slack import action as slack_action
 from forms import ApplicationForm
 
 HTTP_HEADER_REQUEST_ID = 'X-Request-ID'
@@ -75,10 +77,16 @@ def web_hook_slack_action_endpoint():
     """ Receives requests from Slack when someone presses a button in an interactive message.
     """
     request_id = log_request()
-    request_data = request.get_json()
+    data = request.get_data()
+    payload = slack_action.parse_post(data)
+
+    # try:
+    #     request_data = request.get_json(force=True)
+    # except Exception:
+    #     log.error("Exception!")
     d = {
         'status': 'ok',
-        'data': request_data
+        'data': payload
     }
     log.debug(u"request_id={} d: {}".format(request_id, json.dumps(d)))
     return jsonify(**d)
@@ -89,8 +97,6 @@ def web_hook_application_form():
     """ Web hook for incoming application forms.
     """
     request_id = log_request()
-    log.info(u"request_id={} Received form: {}".format(request_id, request.form))
-    log.debug(u"request_id={} Image URL: {}".format(request_id, request.form.get('Field17-url')))
     log.info(u"request_id={} Received form: {}".format(request_id, request.form))
     data = request.form.to_dict()
     log.debug(u"request_id={} Data: {}".format(request_id, data))

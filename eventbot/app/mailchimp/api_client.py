@@ -92,10 +92,30 @@ class MailChimpClient:
         log.debug('{} list/s returned'.format(len(lists['lists'])))
         return lists
 
+    def get_member(self, subscriber_hash, list_id):
+        """ Get member by subscriber hash.
+        """
+        path = '/lists/{}/members/{}'.format(list_id, subscriber_hash)
+        data = self._get(path)
+        return data
+
+    def update_member(self, subscriber_hash, list_id, member):
+        """ Patch member by subscriber hash.
+        """
+        path = '/lists/{}/members/{}'.format(list_id, subscriber_hash)
+        data = self._patch(path, member)
+        return data
+
     def _get(self, path):
         url = '{}{}'.format(BASE_URL, path)
         log.debug(url)
         resp = requests.get(url, headers={'Authorization': 'Basic {}'.format(self.api_key)})
+        return resp.json()
+
+    def _patch(self, path, data):
+        url = '{}{}'.format(BASE_URL, path)
+        log.debug(url)
+        resp = requests.patch(url, headers={'Authorization': 'Basic {}'.format(self.api_key)}, json=data)
         return resp.json()
 
 
