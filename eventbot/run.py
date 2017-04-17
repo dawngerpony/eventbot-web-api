@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 
 import logging
-import pprint
 
 from app import app
 
 import settings
 
-pp = pprint.PrettyPrinter(indent=4)
-logging.basicConfig(format=settings.LOG_FORMAT, level=logging.INFO)
+logging.basicConfig(format=settings.LOG_FORMAT, level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
 

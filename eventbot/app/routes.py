@@ -1,5 +1,5 @@
 import logging
-
+import pprint
 import requests
 import simplejson as json
 from flask import jsonify, request
@@ -14,6 +14,8 @@ HTTP_HEADER_REQUEST_ID = 'X-Request-ID'
 
 log = logging.getLogger(__name__)
 
+pp = pprint.PrettyPrinter(indent=4)
+
 
 def log_request():
     """ Log request details.
@@ -22,6 +24,7 @@ def log_request():
     log.info(u"request_id='{}'".format(request_id))
     log.info(u"headers='{}'".format(str(request.headers).replace('\r\n', ',')))
     log.info(u"query_string='{}'".format(request.query_string))
+    log.info(u"body='{}'".format(request.get_data()))
     return request_id
 
 
@@ -73,8 +76,6 @@ def web_hook_slack_action_endpoint():
     """
     request_id = log_request()
     request_data = request.get_json()
-    # logger.info(u"request_id={} Received MailChimp notification: {}".format(request_id, flask.request.form))
-    log.info("request_id={} headers={} body={}".format(request_id, request.headers, json.dumps(request_data)))
     d = {
         'status': 'ok',
         'data': request_data
@@ -87,16 +88,19 @@ def web_hook_slack_action_endpoint():
 def web_hook_application_form():
     """ Web hook for incoming application forms.
     """
-    request_id = request.headers.get(HTTP_HEADER_REQUEST_ID, 'unknown')
+    request_id = log_request()
     log.info(u"request_id={} Received form: {}".format(request_id, request.form))
-    form = ApplicationForm()
-    log.debug("request_id={} request headers: {}".format(request_id, request.headers))
+    log.debug(u"request_id={} Image URL: {}".format(request_id, request.form.get('Field17-url')))
+    log.info(u"request_id={} Received form: {}".format(request_id, request.form))
+    data = request.form.to_dict()
+    log.debug(u"request_id={} Data: {}".format(request_id, data))
+    form = ApplicationForm(data=data)
     d = {
         'status': 'ok',
-        'form': request.form
+        'form': request.form,
+        'data': data,
     }
-    if form.validate_on_submit():
-        slack.post_form_to_webhook(form)
+    slack.post_form_to_webhook(form)
     log.debug(u"request_id={} d: {}".format(request_id, json.dumps(d)))
     return jsonify(**d)
 
@@ -107,9 +111,9 @@ def web_hook_eventbrite():
     """
     request_id = log_request()
     request_data = request.get_json()
-    if request_data['config']['action'] == 'attendee.updated':
-        log.info("Order placed!")
-        check_membership(request_data['api_url'])
+    # if request_data['config']['action'] == 'attendee.updated':
+    #     log.info("Order placed!")
+    #     check_membership(request_data['api_url'])
     d = {
         'status': 'ok',
         'data': request_data

@@ -1,6 +1,12 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField
+# from flask_wtf import FlaskForm
+# from wtforms import Form, StringField
 
+import logging
+import pprint
+
+log = logging.getLogger(__name__)
+
+pp = pprint.PrettyPrinter(indent=4)
 
 # ImmutableMultiDict([
 # ('Field17', u''),
@@ -20,24 +26,27 @@ from wtforms import StringField
 # ('Field8', u'Fetlife')])
 
 
-FIELD_MAPPINGS = {
-    'name': 'Field3'
-}
+class ApplicationForm:
+    name = None
+    email = None
+    bio = None
+    interests = None
+    imageUrl = None
 
-
-class ApplicationForm(FlaskForm):
-    # name = StringField('Field3', validators=[DataRequired()])
-    Field3 = StringField('Field3') # name
-    Field5 = StringField('Field5') # email
-    Field11 = StringField('Field11') # yourself
-    Field12 = StringField('Field12') # what interests
+    def __init__(self, data):
+        self.name = data['Field3']
+        self.email = data['Field5']
+        self.bio = data['Field11']
+        self.interests = data['Field12']
+        self.imageUrl = data['Field17-url']
 
     def values(self):
         """ Return all values as a dict, with more user-friendly names.
         """
         return {
-            'name': self.Field3.data,
-            'email': self.Field5.data,
-            'bio': self.Field11.data,
-            'interests': self.Field12.data
+            'name': self.name,
+            'email': self.email,
+            'bio': self.bio,
+            'interests': self.interests,
+            'imageUrl': self.imageUrl,
         }
