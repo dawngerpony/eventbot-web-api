@@ -20,6 +20,7 @@ def run(base_url):
     url = "{}/slack/action-endpoint".format(base_url)
     resp = requests.post(url, data=data)
     log.info(resp.status_code)
+    print resp.content
 
 if __name__ == '__main__':
     logging.basicConfig(format=settings.CLI_LOG_FORMAT, level=logging.DEBUG)

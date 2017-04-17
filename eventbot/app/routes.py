@@ -78,18 +78,10 @@ def web_hook_slack_action_endpoint():
     """
     request_id = log_request()
     data = request.get_data()
-    payload = slack_action.parse_post(data)
-
-    # try:
-    #     request_data = request.get_json(force=True)
-    # except Exception:
-    #     log.error("Exception!")
-    d = {
-        'status': 'ok',
-        'data': payload
-    }
-    log.debug(u"request_id={} d: {}".format(request_id, json.dumps(d)))
-    return jsonify(**d)
+    resp = slack_action.parse_post(data)
+    log.debug(u"request_id={} d: {}".format(request_id, json.dumps(data)))
+    # return "{}\n\nSuccessful approval!".format(data['original_message']['text'])
+    return "{}\n\nSuccessful approval!".format(urllib.unquote_plus(resp['payload']['original_message']['text']))
 
 
 @app.route("/webhook/application_form", methods=['POST', 'GET'])

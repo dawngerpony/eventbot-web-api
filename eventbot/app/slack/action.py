@@ -30,4 +30,8 @@ def parse_post(body):
     log.debug(member['interests'])
     member['interests'][settings.MAILCHIMP_INTEREST_ID_SOCIALITE] = True
     resp = mc.update_member(subscriber_hash, list_id, member)
-    return resp
+    obj = {
+        'payload': payload,
+        'resp': resp
+    }
+    return obj
