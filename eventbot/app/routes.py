@@ -80,8 +80,14 @@ def web_hook_slack_action_endpoint():
     data = request.get_data()
     resp = slack_action.parse_post(data)
     log.debug(u"request_id={} d: {}".format(request_id, json.dumps(data)))
-    # return "{}\n\nSuccessful approval!".format(data['original_message']['text'])
-    return "{}\n\nSuccessful approval!".format(urllib.unquote_plus(resp['payload']['original_message']['text']))
+    return """
+{}
+
+*Successful approval by *{}*.*
+""".format(
+        urllib.unquote_plus(resp['payload']['original_message']['text']),
+        resp['payload']['user']['name']
+    )
 
 
 @app.route("/webhook/application_form", methods=['POST', 'GET'])
