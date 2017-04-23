@@ -24,8 +24,13 @@ class NotFoundException(Exception):
 class MailChimpClient:
 
     api_key = ''
+    list_name = ''
 
-    def __init__(self, api_key, cache_timeout=eventbot.integrations.defaults.REQUESTS_CACHE_TIMEOUT):
+    def __init__(
+            self,
+            api_key,
+            cache_timeout=eventbot.integrations.defaults.REQUESTS_CACHE_TIMEOUT
+    ):
         self.api_key = api_key
         requests_cache.install_cache('mailchimp', expire_after=cache_timeout)
 
@@ -99,6 +104,13 @@ class MailChimpClient:
         data = self._get(path)
         return data
 
+    def get_members(self, list_id, params=None):
+        """ Look up members by interest.
+        """
+        path = '/lists/{}/members'.format(list_id)
+        data = self._get(path, params=params)
+        return data
+
     def update_member(self, subscriber_hash, list_id, member):
         """ Patch member by subscriber hash.
         """
@@ -106,10 +118,10 @@ class MailChimpClient:
         data = self._patch(path, member)
         return data
 
-    def _get(self, path):
+    def _get(self, path, params=None):
         url = '{}{}'.format(BASE_URL, path)
         log.debug(url)
-        resp = requests.get(url, headers={'Authorization': 'Basic {}'.format(self.api_key)})
+        resp = requests.get(url, headers={'Authorization': 'Basic {}'.format(self.api_key)}, params=params)
         return resp.json()
 
     def _patch(self, path, data):
@@ -117,6 +129,70 @@ class MailChimpClient:
         log.debug(url)
         resp = requests.patch(url, headers={'Authorization': 'Basic {}'.format(self.api_key)}, json=data)
         return resp.json()
+
+
+class MailChimpInterestManager:
+
+    """:type : MailChimpClient"""
+    mc = None
+    list_name = ''
+    list_id = ''
+    interest_category_name = ''
+    interest_category_id = ''
+
+    def __init__(
+            self,
+            mc,
+            list_name,
+            interest_category_name,
+    ):
+        """
+        
+        :param mc: MailChimpClient
+        :param list_name: basestring
+        :param interest_category_name: basestring 
+        """
+        self.mc = mc
+        self.list_name = list_name
+        self.list_id = mc.lookup_list_id(self.list_name)
+        self.interest_category_name = interest_category_name
+        self.interest_category_id = mc.lookup_interest_category_id(list_name, interest_category_name)
+
+    def lookup_interest_id(self, interest_name):
+        o = self.mc.get_interests(self.list_id, self.interest_category_id)
+        name_id_map = {l['name']: l['id'] for l in o['interests']}
+        return name_id_map.get(interest_name, False)
+
+    def lookup_members_by_interest(self, interest_name):
+        """ Look up members by interest.
+        """
+        interest_id = self.lookup_interest_id(interest_name)
+        params = {
+            'interest_category_id': self.interest_category_id,
+            'interest_ids': interest_id,
+            'interest_match': 'any'
+        }
+        with requests_cache.disabled():
+            members = self.mc.get_members(self.list_id, params=params)
+        return members
+
+    def remove_interest(self, member_id, interest_name):
+        """
+        Remove specified interest from member data.
+        :param member_id: basestring 
+        :param interest_name: basestring
+        :return: 
+        """
+        interest_id = self.lookup_interest_id(interest_name)
+        obj = {
+            'interests': {
+                interest_id: False
+            }
+        }
+        self.mc.update_member(member_id, self.list_id, obj)
+        with requests_cache.disabled():
+            member = self.mc.get_member(member_id, self.list_id)
+        assert member['interests'][interest_id] is False
 
 
 if __name__ == '__main__':
