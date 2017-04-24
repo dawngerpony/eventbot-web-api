@@ -2,7 +2,8 @@
 import click
 import logging
 import pprint
-import simplejson as json
+import requests
+import sys
 
 from eventbot import settings
 from eventbot.app.mailchimp import api_client as mailchimp_client
@@ -38,21 +39,76 @@ def clear_upgraded_segment():
         mc.remove_interest(m['id'], interest_name)
 
 
-# @click.command()
-def lookup_upgraded_segment():
-    """ Download and check attendee data.
+@click.command()
+@click.argument('email_address')
+def upgrade(email_address):
+    """ Upgrade a single person from socialite to member.
     """
-    click.echo("Finding segment...")
-    mc = mailchimp_client.MailChimpClient(settings.MAILCHIMP_APIKEY)
-    interest_id = mc.lookup_interest_id(
+    click.echo("Upgrading {} from socialite to member...".format(email_address))
+    mc = mailchimp_client.MailChimpInterestManager(
+        mailchimp_client.MailChimpClient(settings.MAILCHIMP_APIKEY),
         settings.MAILCHIMP_DEFAULT_LIST,
-        settings.MAILCHIMP_DEFAULT_INTEREST_CATEGORY,
-        settings.MAILCHIMP_INTEREST_NAME_UPGRADED
+        settings.MAILCHIMP_DEFAULT_INTEREST_CATEGORY
     )
-    return interest_id
+    try:
+        member = mc.get_member(email_address)
+    except requests.exceptions.HTTPError as e:
+        click.echo("Error: could not find {} in database (message='{}')".format(email_address, e.message))
+        sys.exit(1)
+    mc.remove_interest(member['id'], settings.MAILCHIMP_INTEREST_NAME_SOCIALITE)
+    mc.add_interest(member['id'], settings.MAILCHIMP_INTEREST_NAME_MEMBER)
+    mc.add_interest(member['id'], settings.MAILCHIMP_INTEREST_NAME_UPGRADED)
 
-# cli.add_command(lookup_upgraded_segment)
+
+@click.command()
+@click.argument('filename')
+def upgrade_file(filename):
+    """ Upgrade a list of users from a file from socialite to member.
+    """
+    mc = mailchimp_client.MailChimpInterestManager(
+        mailchimp_client.MailChimpClient(settings.MAILCHIMP_APIKEY),
+        settings.MAILCHIMP_DEFAULT_LIST,
+        settings.MAILCHIMP_DEFAULT_INTEREST_CATEGORY
+    )
+    with open(filename) as f:
+        email_address_list = f.readlines()
+    email_address_list = map(str.strip, email_address_list)
+    for email_address in email_address_list:
+        try:
+            member = mc.get_member(email_address)
+        except requests.exceptions.HTTPError as e:
+            click.echo("Error: could not find {} in database (message='{}')".format(email_address, e.message))
+            sys.exit(1)
+        mc.remove_interest(member['id'], settings.MAILCHIMP_INTEREST_NAME_SOCIALITE)
+        mc.add_interest(member['id'], settings.MAILCHIMP_INTEREST_NAME_MEMBER)
+        mc.add_interest(member['id'], settings.MAILCHIMP_INTEREST_NAME_UPGRADED)
+        click.echo('Upgraded {}'.format(email_address))
+
+
+@click.command()
+@click.argument('filename')
+def find_list_members(filename):
+    """ Upgrade a list of users from a file from socialite to member.
+    """
+    mc = mailchimp_client.MailChimpInterestManager(
+        mailchimp_client.MailChimpClient(settings.MAILCHIMP_APIKEY),
+        settings.MAILCHIMP_DEFAULT_LIST,
+        settings.MAILCHIMP_DEFAULT_INTEREST_CATEGORY
+    )
+    with open(filename) as f:
+        email_address_list = f.readlines()
+    email_address_list = map(str.strip, email_address_list)
+    for email_address in email_address_list:
+        try:
+            mc.get_member(email_address.strip())
+            click.echo("Found {} in database (message='{}')".format(email_address, e.message))
+        except requests.exceptions.HTTPError as e:
+            click.echo("Error: could not find {} in database (message='{}')".format(email_address, e.message))
+
 cli.add_command(clear_upgraded_segment)
+cli.add_command(find_list_members)
+cli.add_command(upgrade)
+cli.add_command(upgrade_file)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

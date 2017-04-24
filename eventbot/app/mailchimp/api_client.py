@@ -1,6 +1,6 @@
 #!/usr/bin/env python
+import hashlib
 import logging
-
 import requests
 import requests_cache
 
@@ -97,11 +97,11 @@ class MailChimpClient:
         log.debug('{} list/s returned'.format(len(lists['lists'])))
         return lists
 
-    def get_member(self, subscriber_hash, list_id):
+    def get_member(self, subscriber_hash, list_id, use_cache=True):
         """ Get member by subscriber hash.
         """
         path = '/lists/{}/members/{}'.format(list_id, subscriber_hash)
-        data = self._get(path)
+        data = self._get(path, use_cache=use_cache)
         return data
 
     def get_members(self, list_id, params=None):
@@ -118,10 +118,15 @@ class MailChimpClient:
         data = self._patch(path, member)
         return data
 
-    def _get(self, path, params=None):
+    def _get(self, path, params=None, use_cache=True):
         url = '{}{}'.format(BASE_URL, path)
         log.debug(url)
-        resp = requests.get(url, headers={'Authorization': 'Basic {}'.format(self.api_key)}, params=params)
+        if use_cache:
+            resp = requests.get(url, headers={'Authorization': 'Basic {}'.format(self.api_key)}, params=params)
+        else:
+            with requests_cache.disabled():
+                resp = requests.get(url, headers={'Authorization': 'Basic {}'.format(self.api_key)}, params=params)
+        resp.raise_for_status()
         return resp.json()
 
     def _patch(self, path, data):
@@ -158,6 +163,13 @@ class MailChimpInterestManager:
         self.interest_category_name = interest_category_name
         self.interest_category_id = mc.lookup_interest_category_id(list_name, interest_category_name)
 
+    def get_member(self, email_address, use_cache=False):
+        """ Get member by subscriber hash.
+        """
+        subscriber_hash = calculate_subscriber_hash(email_address)
+        data = self.mc.get_member(subscriber_hash, self.list_id, use_cache=use_cache)
+        return data
+
     def lookup_interest_id(self, interest_name):
         o = self.mc.get_interests(self.list_id, self.interest_category_id)
         name_id_map = {l['name']: l['id'] for l in o['interests']}
@@ -176,6 +188,15 @@ class MailChimpInterestManager:
             members = self.mc.get_members(self.list_id, params=params)
         return members
 
+    def add_interest(self, member_id, interest_name):
+        """
+        Add specified interest to member data.
+        :param member_id: basestring 
+        :param interest_name: basestring
+        :return: 
+        """
+        return self._toggle_interest(member_id, interest_name, True)
+
     def remove_interest(self, member_id, interest_name):
         """
         Remove specified interest from member data.
@@ -183,17 +204,34 @@ class MailChimpInterestManager:
         :param interest_name: basestring
         :return: 
         """
+        return self._toggle_interest(member_id, interest_name, False)
+
+    def _toggle_interest(self, member_id, interest_name, toggle):
+        """
+        Toggle specified interest from member data.
+        :param member_id: basestring 
+        :param interest_name: basestring
+        :param toggle: boolean
+        :return: 
+        """
         interest_id = self.lookup_interest_id(interest_name)
         obj = {
             'interests': {
-                interest_id: False
+                interest_id: toggle
             }
         }
         self.mc.update_member(member_id, self.list_id, obj)
         with requests_cache.disabled():
             member = self.mc.get_member(member_id, self.list_id)
-        assert member['interests'][interest_id] is False
+        assert member['interests'][interest_id] is toggle
+        return member
 
+
+def calculate_subscriber_hash(email_address):
+    m = hashlib.md5()
+    m.update(email_address.lower())
+    subscriber_hash = m.hexdigest()
+    return subscriber_hash
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

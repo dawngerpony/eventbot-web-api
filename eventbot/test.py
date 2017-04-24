@@ -37,12 +37,18 @@ class ApiTestCase(unittest.TestCase):
         )
         assert o['data']['config']['action'] == 'order.placed', o
 
-    # @unittest.skip("testing skipping")
     def test_webhook_mailchimp(self):
         data = {
             'test': True
         }
         o = self.post_json_to_webhook(path='/webhook/mailchimp', data=data)
+        assert o['data']['test'] is True, o
+
+    def test_webhook_typeform(self):
+        data = {
+            'test': True
+        }
+        o = self.post_json_to_webhook(path='/webhook/typeform', data=data)
         assert o['data']['test'] is True, o
 
     def post_json_to_webhook(self, path, data):

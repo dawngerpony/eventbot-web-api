@@ -83,7 +83,7 @@ def web_hook_slack_action_endpoint():
     return """
 {}
 
-*Successful approval by *{}*.*
+*Successful approval by {}.*
 """.format(
         urllib.unquote_plus(resp['payload']['original_message']['text']),
         resp['payload']['user']['name']
@@ -130,6 +130,20 @@ def web_hook_eventbrite():
 @app.route("/webhook/mailchimp", methods=['POST', 'GET'])
 def web_hook_mailchimp():
     """ Web hook for incoming MailChimp changes.
+    """
+    request_id = log_request()
+    request_data = request.get_json()
+    d = {
+        'status': 'ok',
+        'data': request_data
+    }
+    log.debug(u"request_id={} d: {}".format(request_id, json.dumps(d)))
+    return jsonify(**d)
+
+
+@app.route("/webhook/typeform", methods=['POST', 'GET'])
+def web_hook_typeform():
+    """ Web hook for incoming Typeform changes.
     """
     request_id = log_request()
     request_data = request.get_json()
