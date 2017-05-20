@@ -133,6 +133,7 @@ class MailChimpClient:
         url = '{}{}'.format(BASE_URL, path)
         log.debug(url)
         resp = requests.patch(url, headers={'Authorization': 'Basic {}'.format(self.api_key)}, json=data)
+        resp.raise_for_status()
         return resp.json()
 
 

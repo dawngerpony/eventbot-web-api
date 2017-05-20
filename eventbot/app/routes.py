@@ -6,7 +6,7 @@ from flask import jsonify, request
 from . import app
 import eventbot.settings
 import urllib
-from attendee_reporter import check_membership
+# from attendee_reporter import check_membership
 from errors import InvalidUsage
 from slack import api_client as slack
 from slack import action as slack_action
@@ -23,10 +23,10 @@ def log_request():
     """ Log request details.
     """
     request_id = request.headers.get(HTTP_HEADER_REQUEST_ID, 'unknown')
-    log.info(u"request_id='{}'".format(request_id))
-    log.info(u"headers='{}'".format(str(request.headers).replace('\r\n', ',')))
-    log.info(u"query_string='{}'".format(request.query_string))
-    log.info(u"body='{}'".format(request.get_data()))
+    log.debug(u"request_id='{}'".format(request_id))
+    log.debug(u"headers='{}'".format(str(request.headers).replace('\r\n', ',')))
+    log.debug(u"query_string='{}'".format(request.query_string))
+    log.debug(u"body='{}'".format(request.get_data().decode('utf-8')))
     return request_id
 
 
@@ -77,17 +77,22 @@ def web_hook_slack_action_endpoint():
     """ Receives requests from Slack when someone presses a button in an interactive message.
     """
     request_id = log_request()
-    data = request.get_data()
+    data = request.get_data().decode('utf-8')
     resp = slack_action.parse_post(data)
     log.debug(u"request_id={} d: {}".format(request_id, json.dumps(data)))
-    return """
+    user = resp['payload']['user']['name']
+    email = resp['payload']['callback_id']
+    original_message_text = resp['payload']['original_message']['text']
+    log.info(u"{} successfully approved {}".format(user, email))
+    message = u"""
 {}
 
 *Successful approval by {}.*
 """.format(
-        urllib.unquote_plus(resp['payload']['original_message']['text']),
-        resp['payload']['user']['name']
+        urllib.unquote_plus(original_message_text),
+        user
     )
+    return message
 
 
 @app.route("/webhook/application_form", methods=['POST', 'GET'])
