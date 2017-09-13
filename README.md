@@ -78,6 +78,8 @@ Tips
 
 ### Adding a new 'slash command'
 
+See [Slash Commands](https://api.slack.com/slash-commands) (official Slack docs).
+
 1. Go to [https://api.slack.com](https://api.slack.com) / Your Apps / Eventbot / Slash commands.
 
 Links
