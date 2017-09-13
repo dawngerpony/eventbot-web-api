@@ -62,6 +62,14 @@ Technologies
 * CircleCI
 * ngrok
 
+
+Tips
+----
+
+### Adding a new 'slash command'
+
+1. Go to [https://api.slack.com](https://api.slack.com) / Your Apps / Eventbot / Slash commands.
+
 Links
 -----
 

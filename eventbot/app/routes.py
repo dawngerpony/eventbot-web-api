@@ -72,6 +72,14 @@ def oauth():
         return jsonify(**resp.json())
 
 
+@app.route("/webhook/slack/command/attendees", methods=['POST'])
+def web_hook_slack_slash_command_attendees():
+    """ For processing '/attendees' commands.
+    """
+    request_id = log_request()
+    data = request.get_data().decode('utf-8')
+
+
 @app.route("/slack/action-endpoint", methods=['POST', 'GET'])
 def web_hook_slack_action_endpoint():
     """ Receives requests from Slack when someone presses a button in an interactive message.
