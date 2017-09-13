@@ -1,8 +1,8 @@
 test:
   override:
-#    - make test
+    - make test
 #    - heroku local test
-    - nose2 --verbose
+#    - nose2 --verbose
 
 deployment:
   staging:

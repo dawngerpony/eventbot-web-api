@@ -13,4 +13,5 @@ db:
 	mongod --dbpath ./data/db
 
 test:
-	heroku local test
+	nose2 --verbose
+#	heroku local test
