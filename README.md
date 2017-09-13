@@ -63,6 +63,16 @@ Technologies
 * ngrok
 
 
+Environment variables
+---------------------
+
+See:
+
+* [.env.example](.env.example) for examples
+* [settings.py](eventbot/settings.py) for default values
+* variables configured into Heroku for live settings
+* variables configured into CircleCI for test settings
+
 Tips
 ----
 

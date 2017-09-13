@@ -93,7 +93,7 @@ def build_form_payload():
     """ Build a payload for the test.
     """
     expected_name = u'Dafydd Integråtion Tëst'
-    expected_email = 'dafydd@afterpandora.com'
+    expected_email = settings.MAILCHIMP_DEFAULT_EMAIL
     expected_bio = 'bio'
     expected_interests = 'interests'
     expected_image_url = 'https://placehold.it/350x150?text=woohoo'
