@@ -1,6 +1,6 @@
 test:
   override:
-    - make test
+    - heroku local test
 
 deployment:
   staging:
