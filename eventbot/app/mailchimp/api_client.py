@@ -234,6 +234,7 @@ def calculate_subscriber_hash(email_address):
     subscriber_hash = m.hexdigest()
     return subscriber_hash
 
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     import pprint
