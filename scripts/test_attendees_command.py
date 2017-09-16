@@ -13,8 +13,10 @@ pp = pprint.PrettyPrinter(indent=4)
 
 @click.command()
 @click.option('--base_url', default='http://localhost:5000', help='Base URL for HTTP requests')
-def run(base_url):
+@click.option('--event_id', default='', help='Eventbrite event ID')
+def run(base_url, event_id):
     data = test_fixtures.ROUTES_WEB_HOOK_SLACK_SLASH_COMMAND_ATTENDEES_EXAMPLE_1
+    data['text'] = event_id
     url = "{}{}".format(base_url, app.routes.ROUTES_WEB_HOOK_SLACK_SLASH_COMMAND_ATTENDEES)
     resp = requests.post(url, data=data)
     log.info(resp.status_code)

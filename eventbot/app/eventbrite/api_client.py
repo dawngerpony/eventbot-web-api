@@ -1,6 +1,7 @@
-import logging
-
+from datetime import datetime
+import dateutil.parser
 import eventbrite
+import logging
 import requests
 import requests_cache
 import simplejson
@@ -17,6 +18,40 @@ class EventbriteClient:
     def __init__(self, eventbrite_oauth_token, cache_timeout=eventbot.integrations.defaults.REQUESTS_CACHE_TIMEOUT):
         self.eventbrite_sdk_client = eventbrite.Eventbrite(eventbrite_oauth_token)
         requests_cache.install_cache('eventbot', expire_after=cache_timeout)
+
+    def get_event_snippets(self, statuses=['live']):
+        """ Generate a set of 'snippets' for all the user's events for a
+            set of status values (defaults to 'live' events).
+        """
+        snippets = []
+        user_events = self.get_user_owned_events()
+        for e in [e for e in user_events['events'] if e['status'] in statuses]:
+            ticket_classes = self.eventbrite_sdk_client.get_event_ticket_classes(event_id=e['id'])
+            snippets.append(
+                {
+                    'name': e['name']['text'],
+                    'id': e['id'],
+                    'status': e['status'],
+                    'start': e['start'],
+                    'days_remaining': calculate_days_remaining(e),
+                    'quantity_sold': calculate_quantity_sold(ticket_classes['ticket_classes']),
+                    'capacity': e['capacity']
+                }
+            )
+        return snippets
+
+    def get_user_owned_events(self):
+        """
+        Get events owned by current user.
+        :return:
+        """
+        data = self.eventbrite_sdk_client.get_user_owned_events(id='me')
+        if 'error' in data:
+            raise Exception(simplejson.dumps(data))
+        assert 'page_count' in data.get('pagination', {}), simplejson.dumps(data)
+        if data['pagination']['page_count'] > 1:
+            raise Exception("There are {0} pages of data".format(data['page_count']))
+        return data
 
     def get_event_attendees(self, event_id):
         """
@@ -91,3 +126,17 @@ def debug(text, data):
 
 def assert_len(x, y, text):
     assert len(x) == len(y), "{0}: len(x)={1}, len(y)={2}".format(text, len(x), len(y))
+
+
+def calculate_days_remaining(event, current_datetime=None):
+    start_date = event['start']['utc']
+    d0 = dateutil.parser.parse(start_date, ignoretz=True)
+    if current_datetime is not None:
+        d1 = dateutil.parser.parse(current_datetime, ignoretz=True)
+    else:
+        d1 = datetime.now()
+    return (d0 - d1).days
+
+
+def calculate_quantity_sold(ticket_classes):
+    return sum([int(tc['quantity_sold']) for tc in ticket_classes])
