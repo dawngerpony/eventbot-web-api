@@ -78,10 +78,14 @@ def oauth():
 def web_hook_slack_slash_command_attendees():
     """ For processing '/attendees' commands.
     """
-    request_id = log_request()
-    data = request.get_data().decode('utf-8')
-    log.info("web_hook_slack_slash_command_attendees")
-    return "ok {}".format(request_id)
+    # request_id = log_request()
+    post_data = request.form
+    log.debug(post_data)
+    return slack_action.parse_slash_command(
+        post_data['command'],
+        post_data['user_name'],
+        post_data
+    )
 
 
 @app.route("/slack/action-endpoint", methods=['POST', 'GET'])
