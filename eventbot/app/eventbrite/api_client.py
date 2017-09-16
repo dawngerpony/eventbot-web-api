@@ -19,6 +19,11 @@ class EventbriteClient:
         requests_cache.install_cache('eventbot', expire_after=cache_timeout)
 
     def get_event_attendees(self, event_id):
+        """
+        Returns a list of event attendees.
+        :param event_id: the ID of the event
+        :return:
+        """
         first_page_data = self.eventbrite_sdk_client.get_event_attendees(event_id=event_id)
         if 'error' in first_page_data:
             raise Exception(simplejson.dumps(first_page_data))

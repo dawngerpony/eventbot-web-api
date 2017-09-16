@@ -161,7 +161,16 @@ j = json.loads(SLACK_ACTION_ENDPOINT_EXAMPLE_1_DECODED)
 s = json.dumps(j)
 SLACK_ACTION_ENDPOINT_EXAMPLE_1 = "payload={}".format(urllib.quote(s))
 
-ROUTES_WEB_HOOK_SLACK_SLASH_COMMAND_ATTENDEES_EXAMPLE_1 = """
-{
+ROUTES_WEB_HOOK_SLACK_SLASH_COMMAND_ATTENDEES_EXAMPLE_1 = {
+    'token': 'xxx',
+    'team_id': 'xxx',
+    'team_domain': 'xxx',
+    'channel_id': 'xxx',
+    'channel_name': 'directmessage',
+    'user_id': 'xxx',
+    'user_name': 'xxx',
+    'command': '/attendees',
+    'text': '',
+    'response_url': 'https://hooks.slack.com/commands/xxx/xxx/xxx',
+    'trigger_id': '241642458561.78045817878.d60374fe965dbebfb95326df2edb8f1a',
 }
-"""

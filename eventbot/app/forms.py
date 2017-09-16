@@ -67,3 +67,26 @@ class ActionForm:
             'interests': self.interests,
             'imageUrl': self.imageUrl,
         }
+
+
+# class SlashCommandForm:
+#
+#     def __init__(self, data):
+#         pass
+#
+#     def values(self):
+#         """ Return all values as a dict, with more user-friendly names.
+#         """
+#         return {
+#             'token': self.token,
+#             'team_id': self.team_id,
+#             'team_domain': self.team_domain,
+#             'channel_id': self.channel_id,
+#             'channel_name': self.channel_name,
+#             'user_id': self.user_id,
+#             'user_name': self.user_name,
+#             'command': self.command,
+#             'text': self.text,
+#             'response_url': self.response_url,
+#             'trigger_id': self.trigger_id,
+#         }

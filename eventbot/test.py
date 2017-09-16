@@ -65,15 +65,14 @@ class ApiTestCase(unittest.TestCase):
 
     def test_web_hook_slack_slash_command_attendees(self):
         data = fixtures.ROUTES_WEB_HOOK_SLACK_SLASH_COMMAND_ATTENDEES_EXAMPLE_1
-        # email = urllib.quote(settings.MAILCHIMP_DEFAULT_EMAIL)
-        # data = data.replace('application_form_action', email)
+        path = routes.ROUTES_WEB_HOOK_SLACK_SLASH_COMMAND_ATTENDEES
         o = self.post_to_endpoint(
-            path=routes.ROUTES_WEB_HOOK_SLACK_SLASH_COMMAND_ATTENDEES,
+            path=path,
             data=data,
-            is_json_data=True,
-            is_json_response=True
+            is_json_data=False,
+            is_json_response=False
         )
-        assert o['status'] == 'ok', o['status']
+        self.assertIn('Attendee list for {}'.format(data['user_name']), o)
 
     def post_to_endpoint(self, path, data, is_json_data=True, is_json_response=True):
         if is_json_data:
