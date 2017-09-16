@@ -1,5 +1,6 @@
 # coding=utf-8
-from app import app
+from __future__ import print_function
+from app import app, routes
 from simplejson import JSONDecodeError
 import logging
 import settings
@@ -62,6 +63,18 @@ class ApiTestCase(unittest.TestCase):
         o = self.post_to_endpoint(path='/slack/action-endpoint', data=data, is_json_data=False, is_json_response=False)
         assert "Successful approval" in o
 
+    def test_web_hook_slack_slash_command_attendees(self):
+        data = fixtures.ROUTES_WEB_HOOK_SLACK_SLASH_COMMAND_ATTENDEES_EXAMPLE_1
+        # email = urllib.quote(settings.MAILCHIMP_DEFAULT_EMAIL)
+        # data = data.replace('application_form_action', email)
+        o = self.post_to_endpoint(
+            path=routes.ROUTES_WEB_HOOK_SLACK_SLASH_COMMAND_ATTENDEES,
+            data=data,
+            is_json_data=True,
+            is_json_response=True
+        )
+        assert o['status'] == 'ok', o['status']
+
     def post_to_endpoint(self, path, data, is_json_data=True, is_json_response=True):
         if is_json_data:
             resp = self.app.post(path, data=json.dumps(data), content_type='application/json')
@@ -71,7 +84,7 @@ class ApiTestCase(unittest.TestCase):
             try:
                 o = json.loads(resp.data)
             except JSONDecodeError as e:
-                print resp.data
+                print(resp.data)
                 self.fail("Problem decoding JSON")
             assert o['status'] == 'ok', o['status']
             return o
@@ -83,7 +96,7 @@ class ApiTestCase(unittest.TestCase):
         try:
             o = json.loads(resp.data)
         except JSONDecodeError:
-            print resp.data
+            print(resp.data)
             self.fail("Problem decoding JSON")
         assert o['status'] == 'ok', o['status']
         return o

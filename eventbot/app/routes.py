@@ -18,6 +18,8 @@ log = logging.getLogger(__name__)
 
 pp = pprint.PrettyPrinter(indent=4)
 
+ROUTES_WEB_HOOK_SLACK_SLASH_COMMAND_ATTENDEES = '/webhook/slack/command/attendees'
+
 
 def log_request():
     """ Log request details.
@@ -72,12 +74,15 @@ def oauth():
         return jsonify(**resp.json())
 
 
-@app.route("/webhook/slack/command/attendees", methods=['POST'])
+@app.route(ROUTES_WEB_HOOK_SLACK_SLASH_COMMAND_ATTENDEES, methods=['POST'])
 def web_hook_slack_slash_command_attendees():
     """ For processing '/attendees' commands.
     """
     request_id = log_request()
     data = request.get_data().decode('utf-8')
+    log.info("web_hook_slack_slash_command_attendees")
+    d = {'status': 'ok'}
+    return jsonify(**d)
 
 
 @app.route("/slack/action-endpoint", methods=['POST', 'GET'])
