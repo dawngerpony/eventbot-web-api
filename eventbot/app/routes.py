@@ -84,6 +84,7 @@ def web_hook_slack_slash_command_attendees():
     return slack_action.parse_slash_command(
         post_data['command'],
         post_data['user_name'],
+        post_data['text'],
         post_data
     )
 

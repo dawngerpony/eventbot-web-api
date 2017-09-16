@@ -16,30 +16,35 @@ pp = pprint.PrettyPrinter(indent=4)
 
 # TODO Make it exclude refunded tickets and other 'not attending' people.
 # TODO Dynamically select the event ID based on date.
-def parse_attendees_command(user_name):
+def parse_attendees_command(user_name, event_id):
     """
     Returns a list of attendees, sorted by ticket class.
+    :param event_id:
     :param user_name:
     :return:
     """
+    event_id = event_id.strip()
     eb_client = EventbriteClient(settings.EVENTBRITE_OAUTH_TOKEN)
-    event_id = '37330486490'
+    if event_id == '':
+        event_id = eb_client.get_event_snippets()[0]['id']
     attendee_data = eb_client.get_event_attendees(event_id)
-    log.debug(attendee_data[0])
-    attendee_data_by_ticket_type = sorted(attendee_data, key=lambda k: k['ticket_class_name'])
+    log.debug(json.dumps(attendee_data[0], indent=2))
+    attendee_data_filtered = [x for x in attendee_data if x['refunded'] is False]
+    attendee_data_by_ticket_type = sorted(attendee_data_filtered, key=lambda k: k['ticket_class_name'])
     lines = [
-        '{}\t{}\t{}\t{}'.format(
+        '{}\t{}\t{}\t{}\t{}'.format(
             i+1,
             x['ticket_class_name'].ljust(20),
             x['profile']['name'].ljust(30),
-            x['profile']['email']
+            x['profile']['email'].ljust(40),
+            str(x['refunded']).lower()
         ) for i, x in enumerate(attendee_data_by_ticket_type)
     ]
     slack_message = 'Attendee list for {}: \n{}'.format(user_name, '\n'.join(lines))
     return slack_message
 
 
-def parse_slash_command(command, user_name, request_data):
+def parse_slash_command(command, user_name, text, request_data):
     """
     Process a slash command message from Slack.
     :param command: the name of the command
@@ -52,7 +57,8 @@ def parse_slash_command(command, user_name, request_data):
     """
     log.debug(u"Request data: {}".format(json.dumps(request_data)))
     if command[1:] == 'attendees':
-        message = parse_attendees_command(user_name)
+        event_id = text.split(' ')[0]  # the first argument
+        message = parse_attendees_command(user_name, event_id)
     return message
 
 def parse_post(body):
