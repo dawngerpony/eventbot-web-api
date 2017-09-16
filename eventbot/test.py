@@ -70,10 +70,10 @@ class ApiTestCase(unittest.TestCase):
         o = self.post_to_endpoint(
             path=routes.ROUTES_WEB_HOOK_SLACK_SLASH_COMMAND_ATTENDEES,
             data=data,
-            is_json_data=True,
-            is_json_response=True
+            is_json_data=False,
+            is_json_response=False
         )
-        assert o['status'] == 'ok', o['status']
+        self.assertIn('ok', o)
 
     def post_to_endpoint(self, path, data, is_json_data=True, is_json_response=True):
         if is_json_data:

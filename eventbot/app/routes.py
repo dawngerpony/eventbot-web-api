@@ -81,8 +81,7 @@ def web_hook_slack_slash_command_attendees():
     request_id = log_request()
     data = request.get_data().decode('utf-8')
     log.info("web_hook_slack_slash_command_attendees")
-    d = {'status': 'ok'}
-    return jsonify(**d)
+    return "ok {}".format(request_id)
 
 
 @app.route("/slack/action-endpoint", methods=['POST', 'GET'])
