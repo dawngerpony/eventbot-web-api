@@ -19,7 +19,7 @@ NB. Tested on a Mac, not on Windows.
 
 ### Pre-requisites
 
-* Python 2.7 with virtualenv
+* Python 2.7 with pipenv
 * Heroku CLI Toolbelt
 * GNU Make
 
@@ -27,9 +27,9 @@ FYI I use [homebrew][1] for most of these things on my Mac.
 
 ### Setup
 
-1. Create a virtualenv: `virtualenv .venv`
-1. Enter the env: `. .venv/bin/activate`
-1. Install pip requirements: `pip install -r requirements.txt`
+Install pip requirements:
+
+    pipenv install
 
 ### To run locally
 
@@ -57,7 +57,7 @@ View the dashboard: [Dashboard](http://localhost:4040/inspect/http)
 Technologies
 ------------
 
-* Python - see [requirements.txt](requirements.txt)
+* Python (with pipenv) - see [Pipfile](Pipfile)
 * Heroku
 * CircleCI
 * ngrok
