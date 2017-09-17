@@ -28,18 +28,18 @@ class ApiTestCase(unittest.TestCase):
         pass
 
     # @unittest.SkipTest
-    def test_webhook_application_form(self, m):
+    def test_webhook_application_form_success(self, m):
         m.register_uri('POST', url=settings.SLACK_WEBHOOK_URL, text='foo')
         self.post_form_to_webhook(path=routes.ROUTES_WEB_HOOK_APPLICATION_FORM, data=build_form_payload())
 
     # @unittest.SkipTest
-    def test_webhook_eventbrite(self, m):
+    def test_webhook_eventbrite_success(self, m):
         data = {'test': True}
         o = self.post_to_endpoint(path=routes.ROUTES_WEB_HOOK_EVENTBRITE, data=data)
         assert o['data']['test'] is True, o
 
     # @unittest.SkipTest
-    def test_webhook_eventbrite_order_placed(self, m):
+    def test_webhook_eventbrite_order_placed_success(self, m):
         o = self.post_to_endpoint(
             path='/webhook/eventbrite',
             data=json.loads(fixtures.EVENTBRITE_ORDER_PLACED)
@@ -47,7 +47,7 @@ class ApiTestCase(unittest.TestCase):
         assert o['data']['config']['action'] == 'order.placed', o
 
     # @unittest.SkipTest
-    def test_webhook_mailchimp(self, m):
+    def test_webhook_mailchimp_success(self, m):
         data = {
             'test': True
         }
@@ -55,7 +55,7 @@ class ApiTestCase(unittest.TestCase):
         assert o['data']['test'] is True, o
 
     # @unittest.SkipTest
-    def test_webhook_typeform(self, m):
+    def test_webhook_typeform_success(self, m):
         data = {
             'test': True
         }
@@ -63,7 +63,7 @@ class ApiTestCase(unittest.TestCase):
         assert o['data']['test'] is True, o
 
     # @unittest.SkipTest
-    def test_slack_action_endpoint(self, m):
+    def test_slack_action_endpoint_success(self, m):
         email = urllib.quote(settings.MAILCHIMP_DEFAULT_EMAIL)
         lists_base_url = '{}/lists'.format(mailchimp.api_client.BASE_URL)
         subscriber_hash = mailchimp.api_client.calculate_subscriber_hash(settings.MAILCHIMP_DEFAULT_EMAIL)
@@ -104,7 +104,7 @@ class ApiTestCase(unittest.TestCase):
         assert "Successful approval" in o
 
     # @unittest.SkipTest
-    def test_web_hook_slack_slash_command_attendees(self, m):
+    def test_web_hook_slack_slash_command_attendees_success(self, m):
         m.register_uri(
             'GET',
             url='https://www.eventbriteapi.com/v3/events/q/attendees/',
