@@ -24,7 +24,7 @@ def parse_attendees_command(user_name, event_id):
     :return:
     """
     event_id = event_id.strip()
-    eb_client = EventbriteClient(settings.EVENTBRITE_OAUTH_TOKEN)
+    eb_client = EventbriteClient(settings.EVENTBRITE_OAUTH_TOKEN, use_cache=settings.USE_CACHE)
     if event_id == '':
         event_id = eb_client.get_event_snippets()[0]['id']
     attendee_data = eb_client.get_event_attendees(event_id)
@@ -61,6 +61,7 @@ def parse_slash_command(command, user_name, text, request_data):
         message = parse_attendees_command(user_name, event_id)
     return message
 
+
 def parse_post(body):
     """ Parse a POST request from Slack.
     """
@@ -79,7 +80,7 @@ def _approve_socialite(email_address):
     """ Approve a socialite.
     """
     manager = MailChimpInterestManager(
-        MailChimpClient(settings.MAILCHIMP_APIKEY),
+        MailChimpClient(settings.MAILCHIMP_APIKEY, use_cache=settings.USE_CACHE),
         settings.MAILCHIMP_DEFAULT_LIST,
         settings.MAILCHIMP_DEFAULT_INTEREST_CATEGORY
     )

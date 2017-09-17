@@ -18,6 +18,8 @@ log = logging.getLogger(__name__)
 
 pp = pprint.PrettyPrinter(indent=4)
 
+ROUTES_WEB_HOOK_APPLICATION_FORM = '/webhook/application_form'
+ROUTES_WEB_HOOK_EVENTBRITE = '/webhook/eventbrite'
 ROUTES_WEB_HOOK_SLACK_SLASH_COMMAND_ATTENDEES = '/webhook/slack/command/attendees'
 
 
@@ -112,7 +114,7 @@ def web_hook_slack_action_endpoint():
     return message
 
 
-@app.route("/webhook/application_form", methods=['POST', 'GET'])
+@app.route(ROUTES_WEB_HOOK_APPLICATION_FORM, methods=['POST', 'GET'])
 def web_hook_application_form():
     """ Web hook for incoming application forms.
     """
@@ -131,7 +133,7 @@ def web_hook_application_form():
     return jsonify(**d)
 
 
-@app.route("/webhook/eventbrite", methods=['POST', 'GET'])
+@app.route(ROUTES_WEB_HOOK_EVENTBRITE, methods=['POST', 'GET'])
 def web_hook_eventbrite():
     """ Web hook for incoming Eventbrite changes.
     """
