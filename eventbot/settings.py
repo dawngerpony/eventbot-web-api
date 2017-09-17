@@ -1,7 +1,7 @@
 # settings.py
-from os.path import join, dirname
+from distutils.util import strtobool
 from dotenv import load_dotenv
-
+from os.path import join, dirname
 import logging
 import os
 
@@ -41,3 +41,5 @@ MAILCHIMP_INTEREST_ID_UPGRADED = os.environ.get('MAILCHIMP_INTEREST_ID_UPGRADED'
 MAILCHIMP_INTEREST_NAME_MEMBER = os.environ.get('MAILCHIMP_INTEREST_NAME_MEMBER', 'Members')
 MAILCHIMP_INTEREST_NAME_SOCIALITE = os.environ.get('MAILCHIMP_INTEREST_NAME_SOCIALITE', 'Socialites')
 MAILCHIMP_INTEREST_NAME_UPGRADED = os.environ.get('MAILCHIMP_INTEREST_NAME_UPGRADED', 'Upgraded')
+
+USE_CACHE = strtobool(os.environ.get('USE_CACHE', 'true'))

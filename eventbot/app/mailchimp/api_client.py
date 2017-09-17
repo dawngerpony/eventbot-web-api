@@ -25,14 +25,18 @@ class MailChimpClient:
 
     api_key = ''
     list_name = ''
+    use_cache = True
 
     def __init__(
             self,
             api_key,
-            cache_timeout=eventbot.integrations.defaults.REQUESTS_CACHE_TIMEOUT
+            cache_timeout=eventbot.integrations.defaults.REQUESTS_CACHE_TIMEOUT,
+            use_cache=True
     ):
         self.api_key = api_key
-        requests_cache.install_cache('mailchimp', expire_after=cache_timeout)
+        self.use_cache = use_cache
+        if self.use_cache is True:
+            requests_cache.install_cache('mailchimp', expire_after=cache_timeout)
 
     def check_interest(self, email, list_name, interest_category_name, interest_name):
         """ Check whether the specified email address is in the list and has the interest.
@@ -224,7 +228,24 @@ class MailChimpInterestManager:
         self.mc.update_member(member_id, self.list_id, obj)
         with requests_cache.disabled():
             member = self.mc.get_member(member_id, self.list_id)
-        assert member['interests'][interest_id] is toggle
+        try:
+            assert member['interests'][interest_id] is toggle
+        except KeyError as ke:
+            log.error("KeyError: message={}, interest_id={}, member={}, toggle={}".format(
+                ke.message,
+                interest_id,
+                member,
+                toggle
+            ))
+            raise ke
+        except AssertionError as ae:
+            log.error("AssertionError: message={}, interest_id={}, member={}, toggle={}".format(
+                ae.message,
+                interest_id,
+                member,
+                toggle
+            ))
+            raise ae
         return member
 
 

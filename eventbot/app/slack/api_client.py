@@ -7,6 +7,7 @@ from eventbot import settings
 log = logging.getLogger(__name__)
 
 
+# TODO Deal with non-200s from Slack
 def post_form_to_webhook(form):
     """ Post the contents of a form to Slack.
     """

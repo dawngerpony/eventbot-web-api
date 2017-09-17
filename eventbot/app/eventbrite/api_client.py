@@ -15,9 +15,15 @@ class EventbriteClient:
 
     eventbrite_sdk_client = None
 
-    def __init__(self, eventbrite_oauth_token, cache_timeout=eventbot.integrations.defaults.REQUESTS_CACHE_TIMEOUT):
+    def __init__(
+            self,
+            eventbrite_oauth_token,
+            cache_timeout=eventbot.integrations.defaults.REQUESTS_CACHE_TIMEOUT,
+            use_cache=False
+    ):
         self.eventbrite_sdk_client = eventbrite.Eventbrite(eventbrite_oauth_token)
-        requests_cache.install_cache('eventbot', expire_after=cache_timeout)
+        if use_cache:
+            requests_cache.install_cache('eventbot', expire_after=cache_timeout)
 
     def get_event_snippets(self, statuses=['live']):
         """ Generate a set of 'snippets' for all the user's events for a
